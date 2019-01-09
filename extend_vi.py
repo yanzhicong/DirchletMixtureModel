@@ -14,12 +14,11 @@ U_data = [                          # actual dirichlet parameters
 ]
 
 # Generate Sample Data
-X_data_cluster_1 = np.random.dirichlet(U_data[0], size=int(Pi_data[0] * N_data)).astype(dtype=np.double)
-X_data_cluster_2 = np.random.dirichlet(U_data[1], size=int(Pi_data[1] * N_data)).astype(dtype=np.double)
-X_data = np.vstack([X_data_cluster_1, X_data_cluster_2])
-np.random.shuffle(X_data)
+X_data = DirichletMixtureModel.generate_X(U_data, Pi_data, N_data)
 
+"""
 
+"""
 def Exp_ln_X(X, O, A, C, nb_run=100):
     result = []
     remain_mixture = np.where(C > 0.00001)[0]
@@ -44,5 +43,4 @@ model.extended_vi(X_data, validate_callback=lambda O,A,C:Exp_ln_X(X_data, O, A, 
 
 print("U_data : ", U_data)
 print("Pi_data : ", Pi_data)
-
 

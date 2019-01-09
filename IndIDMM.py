@@ -6,14 +6,12 @@ import prob_utils as pu
 
 
 
-
-
-
-class DirichletMixtureModel(object):
+class InfiniteInvertedDirichletMixtureModel(object):
     """
         
     """
-    def __init__(self,  K=None, I=None, U=None, PI=None):
+
+    def __init__(self,  K=None, I=None, U=None, PI=None, T=100):
         """
         :param I:   number of mixture components
         :param K:   number of variable dimensions
@@ -30,12 +28,12 @@ class DirichletMixtureModel(object):
             self.K = K
             self.I = I
 
-        # assume the prior of U is gamma distribution in shape of Omega and inverse scale of Alpha
+        # assume U ~ Gamma(Omega (shape param), 1.0/Alpha (scale param))
         # random initialize Omega and Alpha
         self.Omega = np.random.random(size=(K, I)).astype(np.double) * 10 + 6
         self.Alpha = np.random.random(size=(K, I)).astype(np.double) * 5 + 1
 
-        # assume the prior of PI is dirichlet distribution with parameters of C
+        # assume PI ~ Dir(C)
         # random initialize C
         self.C = np.random.randint(2, 9, size=(I,)).astype(dtype=np.double)
 
@@ -58,7 +56,7 @@ class DirichletMixtureModel(object):
     def log_x(self, x):
         pass
 
-    def extended_vi(self, X, max_steps=500, callback_interval=100, validate_callback=None):
+    def extended_vi(self, X, max_steps=500, callback_interval=50, validate_callback=None):
         """
             Use extended variation inference method to solve the posterior distribution of 
             DMM parameters (U, PI) given the observed data X
@@ -150,15 +148,6 @@ class DirichletMixtureModel(object):
         self.Omega = NewOmega
         self.Alpha = NewAlpha
         self.C = NewC
-
-    @classmethod
-    def generate_X(cls, U, PI, x_size):
-        x_data_list = []
-        for ind, pi in enumerate(PI):
-            x_data_list.append(np.random.dirichlet(U[ind], size=int(pi*x_size)).astype(dtype=np.double))
-        x_data = np.vstack(x_data_list)
-        np.random.shuffle(x_data)
-        return x_data
 
 
     @property
